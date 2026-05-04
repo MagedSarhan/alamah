@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/session.php';
+require_once __DIR__ . '/../config/app.php';
 if (is_logged_in()) { header('Location: ../index.php'); exit; }
 $flash = get_flash();
 ?>
@@ -8,11 +9,27 @@ $flash = get_flash();
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="إنشاء حساب جديد في علامة ALAMAH.">
   <title>إنشاء حساب | علامة ALAMAH</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/png" href="../image/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="<?= SITE_URL ?>/image/logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="<?= SITE_URL ?>/image/logo.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="<?= SITE_URL ?>/image/logo.png">
+  <meta name="theme-color" content="#1B2A5B">
+  <link rel="canonical" href="<?= SITE_URL ?>/auth/register.php">
+  <meta property="og:title" content="إنشاء حساب | علامة ALAMAH">
+  <meta property="og:description" content="إنشاء حساب جديد في علامة ALAMAH.">
+  <meta property="og:image" content="<?= SITE_URL ?>/image/logo.png">
+  <meta property="og:url" content="<?= SITE_URL ?>/auth/register.php">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="علامة | ALAMAH">
+  <meta property="og:locale" content="ar_SA">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="إنشاء حساب | علامة ALAMAH">
+  <meta name="twitter:description" content="إنشاء حساب جديد في علامة ALAMAH.">
+  <meta name="twitter:image" content="<?= SITE_URL ?>/image/logo.png">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:'Tajawal',sans-serif;background:linear-gradient(135deg,#F7F1E8 0%,#F0E6D3 50%,#E8C9B8 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;direction:rtl}

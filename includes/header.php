@@ -20,10 +20,30 @@ $activePage = $activePage ?? 'index';
   <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Tajawal:wght@300;400;500;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" type="image/png" href="image/logo.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="<?= base_url('image/logo.png') ?>">
+  <link rel="icon" type="image/png" sizes="16x16" href="<?= base_url('image/logo.png') ?>">
+  <link rel="apple-touch-icon" sizes="180x180" href="<?= base_url('image/logo.png') ?>">
+  <meta name="theme-color" content="#1B2A5B">
+
+  <!-- Canonical -->
+  <link rel="canonical" href="<?= base_url(ltrim($_SERVER['REQUEST_URI'] ?? '', '/')) ?>">
+
+  <!-- Open Graph -->
   <meta property="og:title" content="<?= clean($pageTitle) ?>">
   <meta property="og:description" content="<?= clean($pageDescription) ?>">
-  <meta property="og:image" content="image/logo.png">
+  <meta property="og:image" content="<?= base_url($ogImage ?? 'image/logo.png') ?>">
+  <meta property="og:url" content="<?= base_url(ltrim($_SERVER['REQUEST_URI'] ?? '', '/')) ?>">
+  <meta property="og:type" content="<?= clean($ogType ?? 'website') ?>">
+  <meta property="og:site_name" content="علامة | ALAMAH">
+  <meta property="og:locale" content="ar_SA">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="<?= clean($pageTitle) ?>">
+  <meta name="twitter:description" content="<?= clean($pageDescription) ?>">
+  <meta name="twitter:image" content="<?= base_url($ogImage ?? 'image/logo.png') ?>">
 </head>
 <body>
   <div class="page-loader" id="pageLoader"><img src="image/logo.png" alt="علامة"><div class="loader-bar"></div></div>

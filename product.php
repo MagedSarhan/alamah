@@ -2,6 +2,19 @@
 $pageTitle = 'تفاصيل المنتج | علامة ALAMAH';
 $pageDescription = 'عالم من الهدايا الراقية والمنتجات المخصصة.';
 $activePage = 'products';
+
+if (!empty($_GET['id'])) {
+    require_once __DIR__ . '/classes/Product.php';
+    $productModel = new Product();
+    $product = $productModel->findById((int)$_GET['id']);
+    if ($product) {
+        $pageTitle = clean($product['name'] ?? '') . ' | علامة ALAMAH';
+        $pageDescription = !empty($product['short_description']) ? $product['short_description'] : ($product['description'] ?? $pageDescription);
+        $ogImage = $product['image'] ?? 'image/logo.png';
+        $ogType = 'product';
+    }
+}
+
 require_once __DIR__ . '/includes/header.php';
 ?>
   <div style="height:90px;"></div>
