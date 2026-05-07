@@ -20,6 +20,7 @@ define('BREVO_SENDER_NAME', 'علامة ALAMAH');
 // Verification
 define('VERIFICATION_CODE_LENGTH', 6);
 define('VERIFICATION_CODE_EXPIRY', 15); // minutes
+define('VERIFICATION_RESEND_COOLDOWN', 4); // minutes
 
 // Upload
 define('UPLOAD_MAX_SIZE', 5 * 1024 * 1024); // 5MB

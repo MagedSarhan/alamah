@@ -87,6 +87,20 @@ class User {
         return $code;
     }
 
+    public function getVerificationResendRemaining(int $userId, string $type = 'email_verify'): int {
+        $stmt = $this->db->prepare(
+            "SELECT GREATEST(0, (? * 60) - TIMESTAMPDIFF(SECOND, created_at, NOW())) AS remaining_seconds
+             FROM verification_codes
+             WHERE user_id = ? AND type = ?
+             ORDER BY created_at DESC
+             LIMIT 1"
+        );
+        $stmt->execute([VERIFICATION_RESEND_COOLDOWN, $userId, $type]);
+        $remaining = $stmt->fetchColumn();
+
+        return $remaining === false ? 0 : (int) $remaining;
+    }
+
     public function verifyCode(int $userId, string $code, string $type = 'email_verify'): bool {
         $stmt = $this->db->prepare(
             "SELECT id FROM verification_codes WHERE user_id = ? AND code = ? AND type = ? AND is_used = 0 AND expires_at > NOW() ORDER BY id DESC LIMIT 1"

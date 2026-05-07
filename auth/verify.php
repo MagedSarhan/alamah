@@ -1,9 +1,12 @@
 <?php
 require_once __DIR__ . '/../config/session.php';
 require_once __DIR__ . '/../config/app.php';
-if (!isset($_SESSION['pending_verify_user_id'])) { header('Location: login.php'); exit; }
+require_once __DIR__ . '/../classes/User.php';
+$userId = $_SESSION['pending_verify_user_id'] ?? null;
+if (!$userId) { header('Location: login.php'); exit; }
 $flash = get_flash();
 $email = $_SESSION['pending_verify_email'] ?? '';
+$resendRemaining = (new User())->getVerificationResendRemaining((int) $userId);
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -46,6 +49,10 @@ $email = $_SESSION['pending_verify_email'] ?? '';
     .btn-auth:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(27,42,91,0.3)}
     .resend-link{margin-top:1.5rem;font-size:0.85rem;color:#8A8580}
     .resend-link a{color:#D63B2F;font-weight:600;text-decoration:none}
+    .resend-form{display:inline}
+    .resend-button{background:none;border:none;color:#D63B2F;font-weight:600;cursor:pointer;font-family:inherit;font-size:inherit}
+    .resend-button:disabled{color:#B5AFA8;cursor:not-allowed}
+    .resend-countdown{display:inline-block;min-width:48px;direction:ltr;font-weight:700;color:#1B2A5B}
     .alert{padding:0.8rem 1rem;border-radius:10px;margin-bottom:1rem;font-size:0.85rem;font-weight:500;text-align:right}
     .alert-error{background:#FEE;color:#D63B2F;border:1px solid #FCC}
     .alert-success{background:#EFE;color:#2A7E2A;border:1px solid #CEC}
@@ -78,13 +85,15 @@ $email = $_SESSION['pending_verify_email'] ?? '';
       <button type="submit" class="btn-auth">تأكيد</button>
     </form>
 
-    <p class="resend-link">لم يصلك الرمز؟
-      <form method="POST" action="process.php" style="display:inline">
+    <div class="resend-link">
+      <span>لم يصلك الرمز؟</span>
+      <form method="POST" action="process.php" class="resend-form">
         <input type="hidden" name="action" value="resend">
         <?= csrf_field() ?>
-        <button type="submit" style="background:none;border:none;color:#D63B2F;font-weight:600;cursor:pointer;font-family:inherit;font-size:inherit;">إعادة الإرسال</button>
+        <button type="submit" class="resend-button" id="resendButton" <?= $resendRemaining > 0 ? 'disabled' : '' ?>>إعادة الإرسال</button>
+        <span id="resendCountdown" class="resend-countdown" data-remaining="<?= (int) $resendRemaining ?>"></span>
       </form>
-    </p>
+    </div>
   </div>
 
   <script>
@@ -102,6 +111,29 @@ $email = $_SESSION['pending_verify_email'] ?? '';
     document.getElementById('verifyForm').addEventListener('submit', (e) => {
       document.getElementById('fullCode').value = [...inputs].map(i => i.value).join('');
     });
+
+    const resendButton = document.getElementById('resendButton');
+    const resendCountdown = document.getElementById('resendCountdown');
+    let resendRemaining = parseInt(resendCountdown?.dataset.remaining || '0', 10);
+
+    function renderResendCountdown() {
+      if (!resendButton || !resendCountdown) return;
+
+      if (resendRemaining <= 0) {
+        resendButton.disabled = false;
+        resendCountdown.textContent = '';
+        return;
+      }
+
+      resendButton.disabled = true;
+      const minutes = Math.floor(resendRemaining / 60).toString().padStart(2, '0');
+      const seconds = (resendRemaining % 60).toString().padStart(2, '0');
+      resendCountdown.textContent = `(${minutes}:${seconds})`;
+      resendRemaining -= 1;
+    }
+
+    renderResendCountdown();
+    setInterval(renderResendCountdown, 1000);
   </script>
 </body>
 </html>

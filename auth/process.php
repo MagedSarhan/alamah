@@ -96,6 +96,14 @@ switch ($action) {
         $userId = $_SESSION['pending_verify_user_id'] ?? null;
         $email = $_SESSION['pending_verify_email'] ?? null;
         if ($userId && $email) {
+            $remaining = $userModel->getVerificationResendRemaining((int) $userId);
+            if ($remaining > 0) {
+                $minutes = floor($remaining / 60);
+                $seconds = $remaining % 60;
+                set_flash('info', sprintf('Please wait %02d:%02d before resending the verification email.', $minutes, $seconds));
+                header('Location: verify.php'); exit;
+            }
+
             $user = $userModel->findById($userId);
             $code = $userModel->createVerificationCode($userId);
             $emailSent = Mailer::sendVerificationCode($email, $user['name'], $code);
