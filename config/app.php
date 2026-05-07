@@ -5,12 +5,12 @@
 
 // Site
 define('SITE_NAME', 'علامة | ALAMAH');
-define('SITE_URL', 'http://localhost/Alamah%20v3');
+define('SITE_URL', getenv('SITE_URL') ?: 'https://3lamah.com');
 define('BASE_PATH', dirname(__DIR__));
 
 // Brevo (Sendinblue) API
-define('BREVO_API_KEY', getenv('BREVO_API_KEY') ?: '');
-define('BREVO_SENDER_EMAIL', 'noreply@alamah.sa');
+define('BREVO_API_KEY', trim(getenv('BREVO_API_KEY') ?: ''));
+define('BREVO_SENDER_EMAIL', getenv('BREVO_SENDER_EMAIL') ?: 'info@3lamah.com');
 define('BREVO_SENDER_NAME', 'علامة ALAMAH');
 
 // Verification

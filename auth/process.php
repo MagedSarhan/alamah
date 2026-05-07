@@ -50,10 +50,18 @@ switch ($action) {
         $code = $userModel->createVerificationCode($userId);
 
         // Send verification email
-        Mailer::sendVerificationCode($email, $name, $code);
+        $emailSent = Mailer::sendVerificationCode($email, $name, $code);
+        if (!$emailSent) {
+            error_log('Verification email failed for new user ' . $userId . ': ' . Mailer::getLastError());
+        }
 
         $_SESSION['pending_verify_user_id'] = $userId;
         $_SESSION['pending_verify_email'] = $email;
+        if (!$emailSent) {
+            set_flash('error', 'Account created, but the verification email was not sent. Check BREVO_API_KEY and sender info@3lamah.com, then use resend.');
+            header('Location: verify.php');
+            exit;
+        }
         set_flash('success', 'تم إنشاء الحساب! تحقق من بريدك الإلكتروني');
         header('Location: verify.php');
         exit;
@@ -90,8 +98,12 @@ switch ($action) {
         if ($userId && $email) {
             $user = $userModel->findById($userId);
             $code = $userModel->createVerificationCode($userId);
-            Mailer::sendVerificationCode($email, $user['name'], $code);
+            $emailSent = Mailer::sendVerificationCode($email, $user['name'], $code);
             set_flash('success', 'تم إعادة إرسال رمز التحقق');
+            if (!$emailSent) {
+                error_log('Verification email resend failed for user ' . $userId . ': ' . Mailer::getLastError());
+                set_flash('error', 'Verification email was not sent. Check BREVO_API_KEY and sender info@3lamah.com.');
+            }
         }
         header('Location: verify.php'); exit;
 
@@ -118,8 +130,12 @@ switch ($action) {
             $_SESSION['pending_verify_user_id'] = $user['id'];
             $_SESSION['pending_verify_email'] = $user['email'];
             $code = $userModel->createVerificationCode($user['id']);
-            Mailer::sendVerificationCode($user['email'], $user['name'], $code);
+            $emailSent = Mailer::sendVerificationCode($user['email'], $user['name'], $code);
             set_flash('info', 'حسابك غير مفعل. تحقق من بريدك');
+            if (!$emailSent) {
+                error_log('Verification email failed for existing user ' . $user['id'] . ': ' . Mailer::getLastError());
+                set_flash('error', 'Verification email was not sent. Check BREVO_API_KEY and sender info@3lamah.com.');
+            }
             header('Location: verify.php'); exit;
         }
 
@@ -143,7 +159,10 @@ switch ($action) {
         $user = $userModel->findByEmail($email);
         if ($user) {
             $code = $userModel->createVerificationCode($user['id'], 'password_reset');
-            Mailer::sendPasswordResetCode($email, $user['name'], $code);
+            $emailSent = Mailer::sendPasswordResetCode($email, $user['name'], $code);
+            if (!$emailSent) {
+                error_log('Password reset email failed for user ' . $user['id'] . ': ' . Mailer::getLastError());
+            }
             $_SESSION['reset_user_id'] = $user['id'];
         }
         set_flash('success', 'إذا كان البريد مسجلاً، ستتلقى رمز إعادة التعيين');

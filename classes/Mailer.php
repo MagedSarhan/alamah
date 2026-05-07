@@ -6,11 +6,30 @@
 require_once __DIR__ . '/../config/app.php';
 
 class Mailer {
+    private static string $lastError = '';
+
+    public static function getLastError(): string {
+        return self::$lastError;
+    }
 
     /**
      * Send email via Brevo API
      */
     public static function send(string $toEmail, string $toName, string $subject, string $htmlContent): bool {
+        self::$lastError = '';
+
+        if (BREVO_API_KEY === '') {
+            self::$lastError = 'BREVO_API_KEY is not configured';
+            error_log('Brevo API Error: ' . self::$lastError);
+            return false;
+        }
+
+        if (!function_exists('curl_init')) {
+            self::$lastError = 'PHP cURL extension is not enabled';
+            error_log('Brevo API Error: ' . self::$lastError);
+            return false;
+        }
+
         $url = 'https://api.brevo.com/v3/smtp/email';
 
         $data = [
@@ -20,11 +39,18 @@ class Mailer {
             'htmlContent' => $htmlContent
         ];
 
+        $payload = json_encode($data, JSON_UNESCAPED_UNICODE);
+        if ($payload === false) {
+            self::$lastError = 'Failed to encode Brevo email payload: ' . json_last_error_msg();
+            error_log('Brevo API Error: ' . self::$lastError);
+            return false;
+        }
+
         $ch = curl_init($url);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST           => true,
-            CURLOPT_POSTFIELDS     => json_encode($data),
+            CURLOPT_POSTFIELDS     => $payload,
             CURLOPT_HTTPHEADER     => [
                 'accept: application/json',
                 'api-key: ' . BREVO_API_KEY,
@@ -42,6 +68,7 @@ class Mailer {
 
         // Log errors for debugging
         if ($httpCode < 200 || $httpCode >= 300) {
+            self::$lastError = trim("HTTP {$httpCode}: {$response} {$curlError}");
             error_log("Brevo API Error [{$httpCode}]: {$response} | cURL: {$curlError}");
         }
 
