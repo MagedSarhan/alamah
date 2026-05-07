@@ -5,12 +5,16 @@
 
 // Site
 define('SITE_NAME', 'علامة | ALAMAH');
-define('SITE_URL', getenv('SITE_URL') ?: 'https://3lamah.com');
 define('BASE_PATH', dirname(__DIR__));
 
+$secretsFile = __DIR__ . '/secrets.php';
+$secrets = is_file($secretsFile) ? require $secretsFile : [];
+
+define('SITE_URL', getenv('SITE_URL') ?: ($secrets['SITE_URL'] ?? 'https://3lamah.com'));
+
 // Brevo (Sendinblue) API
-define('BREVO_API_KEY', trim(getenv('BREVO_API_KEY') ?: ''));
-define('BREVO_SENDER_EMAIL', getenv('BREVO_SENDER_EMAIL') ?: 'info@3lamah.com');
+define('BREVO_API_KEY', trim(getenv('BREVO_API_KEY') ?: ($secrets['BREVO_API_KEY'] ?? '')));
+define('BREVO_SENDER_EMAIL', getenv('BREVO_SENDER_EMAIL') ?: ($secrets['BREVO_SENDER_EMAIL'] ?? 'info@3lamah.com'));
 define('BREVO_SENDER_NAME', 'علامة ALAMAH');
 
 // Verification
